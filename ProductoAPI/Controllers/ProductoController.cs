@@ -65,5 +65,44 @@ namespace ProductoAPI.Controllers
 
             return CreatedAtAction(nameof(GetById), new { id = producto.Id }, null);
         }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Put(int id, ProductoUpdateDTO nuevoProductoDTO)
+        {
+            var producto = await _context.Productos.FindAsync(id);
+            if (producto == null) 
+            { 
+                return NotFound(); 
+            }
+
+            producto.Nombre = nuevoProductoDTO.Nombre;
+            producto.Precio = nuevoProductoDTO.Precio;
+            producto.Stock = nuevoProductoDTO.Stock;
+
+            _context.SaveChanges();
+            var nuevoProducto = new ProductoDTO
+            {
+                Id = producto.Id,
+                Nombre = producto.Nombre,
+                Precio = producto.Precio,
+                Stock = producto.Stock,
+            };
+            return Ok(nuevoProducto);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var producto = await _context.Productos.FindAsync(id);
+            if (producto == null)
+            {
+                return NotFound();
+            }
+
+            _context.Productos.Remove(producto);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
     }
 }
